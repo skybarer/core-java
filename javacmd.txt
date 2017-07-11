@@ -1,0 +1,2 @@
+java -XX:+PrintFlagsFinal -version
+java -XX:+PrintFlagsFinal -version | findstr /i "HeapSize PermSize ThreadStackSize"
