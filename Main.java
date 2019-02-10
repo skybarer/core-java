@@ -1,57 +1,50 @@
-package security;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Security;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+package academy.learnprogramming.mergesort;
 
 public class Main {
 
-	protected final static Logger LOGGER = Logger.getLogger(Main.class);
+    public static void main(String[] args) {
+        int[] intArray = { 20, 35, -15, 7, 55, 1, -22 };
 
-	public static final int KEY_SIZE = 2048;
+        mergeSort(intArray, 0, intArray.length);
 
-	public static void main(String[] args)
-			throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
+        for (int i = 0; i < intArray.length; i++) {
+            System.out.println(intArray[i]);
+        }
+    }
 
-		BasicConfigurator.configure();
-		Security.addProvider(new BouncyCastleProvider());
-		LOGGER.info("BouncyCastle provider added.");
+    // { 20, 35, -15, 7, 55, 1, -22 }
+    public static void mergeSort(int[] input, int start, int end) {
 
-		KeyPair keyPair = generateRSAKeyPair();
-		RSAPrivateKey priv = (RSAPrivateKey) keyPair.getPrivate();
-		RSAPublicKey pub = (RSAPublicKey) keyPair.getPublic();
+        if (end - start < 2) {
+            return;
+        }
 
-		writePemFile(priv, "RSA PRIVATE KEY", "id_rsa");
-		writePemFile(pub, "RSA PUBLIC KEY", "id_rsa.pub");
+        int mid = (start + end) / 2;
+        mergeSort(input, start, mid);
+        mergeSort(input, mid, end);
+        merge(input, start, mid, end);
+    }
 
-	}
+    // { 20, 35, -15, 7, 55, 1, -22 }
+    public static void merge(int[] input, int start, int mid, int end) {
 
-	private static KeyPair generateRSAKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException {
-		KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "BC");
-		generator.initialize(KEY_SIZE);
+        if (input[mid - 1] <= input[mid]) {
+            return;
+        }
 
-		KeyPair keyPair = generator.generateKeyPair();
-		LOGGER.info("RSA key pair generated.");
-		return keyPair;
-	}
+        int i = start;
+        int j = mid;
+        int tempIndex = 0;
 
-	private static void writePemFile(Key key, String description, String filename)
-			throws FileNotFoundException, IOException {
-		
-		PemFile pemFile = new PemFile(key, description);
-		pemFile.write(filename);
-		LOGGER.info(String.format("%s successfully writen in file %s.", description, filename));
-	}
+        int[] temp = new int[end - start];
+        while (i < mid && j < end) {
+            temp[tempIndex++] = input[i] <= input[j] ? input[i++] : input[j++];
+        }
+
+        System.arraycopy(input, i, input, start + tempIndex, mid - i);
+        System.arraycopy(temp, 0, input, start, tempIndex);
+
+
+    }
 
 }
